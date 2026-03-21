@@ -1,52 +1,83 @@
-# Personal Finance Aggregator: Аналитика личных финансов
+# Personal Finance Aggregator
 
-![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
+![Python](https://img.shields.io/badge/python-3.13%2B-blue.svg)
 ![Pandas](https://img.shields.io/badge/pandas-data--processing-green.svg)
-![Logging](https://img.shields.io/badge/logging-enabled-orange.svg)
+![Pytest](https://img.shields.io/badge/tests-pytest-orange.svg)
 
-**Personal Finance Aggregator** — это инструмент для автоматизации учета и анализа финансовых операций. Проект ориентирован на глубокую обработку данных, генерацию отчетов и получение актуальной рыночной информации (курсы валют, котировки акций).
+**Personal Finance Aggregator** is a Python project for transaction analytics and report generation.
+It processes bank operations from Excel files, builds aggregated JSON output for a dashboard-like view,
+fetches currency rates from the Central Bank of Russia, and retrieves stock prices from Financial Modeling Prep.
 
-## Ключевой функционал
-* **Анализ транзакций:** Обработка банковских выписок в формате Excel/CSV с использованием библиотеки Pandas.
-* **Интеграция с внешними API:** Автоматический парсинг актуальных курсов валют с сайта Центрального Банка РФ.
-* **Генерация отчетов:** Создание детализированных JSON-отчетов по тратам, категориям и остаткам на счетах.
-* **Система логирования:** Расширенное отслеживание работы каждого модуля (декораторы для логирования функций).
-* **Кастомная конфигурация:** Управление списком отслеживаемых акций и валют через пользовательские настройки (JSON).
+## Features
 
-## Технологический стек
-* **Core:** Python 3.11+.
-* **Data Processing:** Pandas (DataFrame manipulation, filtering, aggregation).
-* **Integrations:** Requests (HTTP-запросы к API ЦБ и сторонним сервисам).
-* **Tools:** Logging, JSON, Datetime.
+- Analyze transactions with `pandas`.
+- Build a consolidated JSON response with:
+  - greeting by current time,
+  - card spending summary,
+  - top transactions,
+  - preferred currency rates,
+  - selected stock prices.
+- Generate category spending reports as JSON files.
+- Find person-to-person transfer transactions.
+- Log module execution and error details to `logs/`.
 
-## Архитектура проекта
-Проект построен по модульному принципу:
-* `views.py`: Главный контроллер, отвечающий за сборку финальных данных для интерфейса.
-* `reports.py`: Модуль генерации аналитических отчетов.
-* `services.py`: Вспомогательная логика по работе с API и конвертации валют.
-* `utils.py`: Общие утилиты и декораторы для логирования.
+## Tech Stack
 
-## Установка и запуск
+- Python 3.13+
+- Poetry
+- Pandas
+- Requests
+- Pytest
 
-1. Клонируйте репозиторий:
+## Project Structure
 
-    git clone https://github.com/AJLbN0H/personal-finance-aggregator.git
+- `src/views.py` - orchestration logic for the main JSON response (`main_page`).
+- `src/reports.py` - report decorators and category spending report.
+- `src/services.py` - transfer filtering service.
+- `src/utils.py` - shared utilities (Excel loading, date parsing, currency conversion, settings loading).
+- `tests/` - automated unit tests.
 
-2. Установите зависимости (используется Poetry):
+## Installation
 
-    poetry install
+1. Clone the repository:
 
-3. Подготовьте данные:
-Поместите ваши файлы транзакций (Excel) в папку `data/` и настройте `user_settings.json`.
+   `git clone https://github.com/AJLbN0H/personal-finance-aggregator.git`
 
-4. Запустите основной скрипт анализа:
+2. Install dependencies:
 
-    python main.py
+   `poetry install`
 
-## Тестирование и качество кода
-В проекте реализована система декораторов для автоматического логирования выполнения функций, что упрощает отладку и мониторинг состояния системы.
+3. Set up environment variables:
 
-## Roadmap
-* Добавление графической визуализации данных (Matplotlib / Plotly).
-* Разработка веб-интерфейса на базе Django/FastAPI.
-* Покрытие аналитических модулей Unit-тестами.
+   - Copy `.env.example` to `.env`
+   - Set `APISP500` with your Financial Modeling Prep API key
+
+4. Prepare input files:
+
+   - Put operations data into `data/operations.xlsx`
+   - Configure `user_settings.json` (currencies and stocks)
+
+## Usage
+
+This project is library-style (no `main.py` entrypoint).  
+Call `main_page` from Python:
+
+`poetry run python -c "from src.views import main_page; print(main_page())"`
+
+Or with a specific datetime:
+
+`poetry run python -c "from src.views import main_page; print(main_page('2026-03-21 12:00:00'))"`
+
+## Testing
+
+Run the test suite:
+
+`poetry run pytest`
+
+Current coverage in this repository includes modules in `src/` with 40+ tests.
+
+## Notes
+
+- Logs are written to `logs/`.
+- Currency rates are fetched from CBR XML API.
+- Stock prices are fetched from Financial Modeling Prep.
